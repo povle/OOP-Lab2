@@ -8,32 +8,36 @@ class Set
 {
 public:
     Set();
-    bool add(T obj);
+    ~Set();
+    bool add(const T obj);
+    bool operator<<(const T obj);
+    bool operator[](const T obj);
+
+
     class Iterator {
         public:
+            Iterator() = default;
+            Iterator(const Set<T> *set, unsigned int curr_bucket, typename std::list<T>::iterator it) :
+                set(set), curr_bucket(curr_bucket), it(it)  {};
+            ~Iterator() = default;
             T operator*() const;
             Iterator &operator++();
+
             bool operator==(const Iterator &other) const;
             bool operator!=(const Iterator &other) const;
-            bool operator<(const Iterator &other) const;
-            bool operator>(const Iterator &other) const;
-            bool operator<=(const Iterator &other) const;
-            bool operator>=(const Iterator &other) const;
-        private:
-            Iterator() = default;
-            Iterator(unsigned int curr_bucket, unsigned int curr_pos) :
-                curr_bucket(curr_bucket), curr_pos(curr_pos) {};
-            unsigned int curr_bucket, curr_pos;
-            Set *set;
+//        private:
+            const Set<T> *set;
+            unsigned int curr_bucket;
+            typename std::list<T>::iterator it;
         };
     Iterator begin() const;
     Iterator end() const;
 private:
     unsigned int size, capacity, min_bucket, max_bucket;
-    float max_load_factor;
+    const float max_load_factor = 0.75;
     float get_load_factor() const;
     void grow();
-    bool place(T obj, std::list<T> *buckets, unsigned int capacity);
+    unsigned int place(T obj, std::list<T> *buckets, unsigned int capacity);
 
     std::list<T> *buckets;
 };
