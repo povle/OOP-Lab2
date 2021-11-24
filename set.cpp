@@ -1,15 +1,12 @@
 #include "set.h"
 #include <list>
 #include <functional>
-#include <iostream>
 
 template <typename T>
 T Set<T>::Iterator::operator*() const
 {
     return *it;
 }
-
-
 
 template <typename T>
 bool Set<T>::Iterator::operator==(const Set<T>::Iterator &other) const {
@@ -77,9 +74,16 @@ Set<T>::~Set()
 template <typename T>
 unsigned int Set<T>::place(T obj, std::list<T> *buckets, unsigned int capacity)
 {
-    unsigned int bucket = std::hash<T>()(obj) % capacity;
+    unsigned int bucket = get_bucket(obj, capacity);
     buckets[bucket].push_back(obj);
     return bucket;
+}
+
+template <typename T>
+void Set<T>::remove(T obj)
+{
+    unsigned int bucket = get_bucket(obj, capacity);
+    buckets[bucket].remove(obj);
 }
 
 template <typename T>
@@ -120,15 +124,47 @@ bool Set<T>::operator<<(const T obj)
 }
 
 template <typename T>
-bool Set<T>::operator[](const T obj)
+bool Set<T>::operator[](const T obj) const
 {
-    unsigned int bucket = std::hash<T>()(obj) % capacity;
+    unsigned int bucket = get_bucket(obj, capacity);
 
     for (auto iter = buckets[bucket].begin(); iter != buckets[bucket].end(); ++iter)
         if ((*iter) == obj)
             return true;
 
     return false;
+}
+
+template <typename T>
+bool Set<T>::operator==(const Set<T> &other) const
+{
+    if (get_size() != other.get_size())
+        return false;
+
+    for (auto i = begin(); i != end(); ++i)
+        if (!(other[*i]))
+            return false;
+
+    return true;
+}
+
+template <typename T>
+bool Set<T>::operator!=(const Set<T> &other) const
+{
+    return !((*this) == other);
+}
+
+
+template <typename T>
+Set<T> Set<T>::operator&&(const Set<T> &other) const
+{
+    Set<T> intersection;
+
+    for (auto i = begin(); i != end(); ++i)
+        if (other[*i])
+            intersection << *i;
+
+    return intersection;
 }
 
 
@@ -140,12 +176,11 @@ void Set<T>::grow()
     std::list<T> *new_buckets = new std::list<T>[new_capacity];
 
     for (auto iter = begin(); iter != end(); ++iter)
-    {
         place(*iter, new_buckets, new_capacity);
-    }
 
     delete [] buckets;
     buckets = new_buckets;
+    capacity = new_capacity;
 }
 
 
@@ -153,4 +188,16 @@ template <typename T>
 float Set<T>::get_load_factor() const
 {
     return float(size)/float(capacity);
+}
+
+template <typename T>
+unsigned int Set<T>::get_size() const
+{
+    return size;
+}
+
+template <typename T>
+unsigned int Set<T>::get_bucket(const T obj, unsigned int capacity) const
+{
+    return std::hash<T>()(obj) % capacity;
 }
