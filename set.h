@@ -9,7 +9,8 @@ class Set
 public:
     Set();
     ~Set();
-    void remove(T obj);
+    bool remove(T obj);
+    void clear();
     bool operator<<(const T obj);
     bool operator[](const T obj) const;
     bool operator==(const Set<T> &other) const;
@@ -44,6 +45,8 @@ private:
     bool add(const T obj);
     unsigned int get_bucket(const T obj, unsigned int capacity) const;
     unsigned int place(T obj, std::list<T> *buckets, unsigned int capacity);
+    void update_min_bucket();
+    void update_max_bucket();
 
     std::list<T> *buckets;
 };

@@ -45,11 +45,15 @@ typename Set<T>::Iterator &Set<T>::Iterator::operator++()
 
 template <typename T>
 typename Set<T>::Iterator Set<T>::begin() const {
+    if (size == 0)
+        return end();
     return Iterator(this, min_bucket, buckets[min_bucket].begin());
 }
 
 template <typename T>
 typename Set<T>::Iterator Set<T>::end() const {
+    if (size == 0)
+        return Iterator(this, 0, buckets[0].end());
     return Iterator(this, max_bucket, buckets[max_bucket].end());
 }
 
@@ -80,10 +84,33 @@ unsigned int Set<T>::place(T obj, std::list<T> *buckets, unsigned int capacity)
 }
 
 template <typename T>
-void Set<T>::remove(T obj)
+bool Set<T>::remove(T obj)
 {
     unsigned int bucket = get_bucket(obj, capacity);
+    unsigned int old_size = buckets[bucket].size();
     buckets[bucket].remove(obj);
+    if (buckets[bucket].size() < old_size)
+    {
+        size--;
+        if (bucket==min_bucket)
+            update_min_bucket();
+        if (bucket==max_bucket)
+            update_max_bucket();
+        return true;
+    }
+    return false;
+}
+
+template <typename T>
+void Set<T>::clear()
+{
+    if (size == 0)
+        return;
+    std::list<T> *new_buckets = new std::list<T>[capacity];
+
+    delete [] buckets;
+    buckets = new_buckets;
+    size = 0;
 }
 
 template <typename T>
@@ -115,7 +142,6 @@ bool Set<T>::add(const T obj)
 
     return true;
 }
-
 
 template <typename T>
 bool Set<T>::operator<<(const T obj)
@@ -154,7 +180,6 @@ bool Set<T>::operator!=(const Set<T> &other) const
     return !((*this) == other);
 }
 
-
 template <typename T>
 Set<T> Set<T>::operator&&(const Set<T> &other) const
 {
@@ -167,22 +192,30 @@ Set<T> Set<T>::operator&&(const Set<T> &other) const
     return intersection;
 }
 
-
-
 template <typename T>
 void Set<T>::grow()
 {
     unsigned int new_capacity = capacity * 2;
+    unsigned int new_max_bucket = 0;
+    unsigned int new_min_bucket = new_capacity - 1;
+    unsigned int bucket;
     std::list<T> *new_buckets = new std::list<T>[new_capacity];
 
     for (auto iter = begin(); iter != end(); ++iter)
-        place(*iter, new_buckets, new_capacity);
+    {
+        bucket = place(*iter, new_buckets, new_capacity);
+        if (bucket < new_min_bucket)
+            new_min_bucket = bucket;
+        if (bucket > new_max_bucket)
+            new_max_bucket = bucket;
+    }
 
     delete [] buckets;
     buckets = new_buckets;
     capacity = new_capacity;
+    max_bucket = new_max_bucket;
+    min_bucket = new_min_bucket;
 }
-
 
 template <typename T>
 float Set<T>::get_load_factor() const
@@ -201,3 +234,26 @@ unsigned int Set<T>::get_bucket(const T obj, unsigned int capacity) const
 {
     return std::hash<T>()(obj) % capacity;
 }
+
+template <typename T>
+void Set<T>::update_min_bucket()
+{
+    for (unsigned int i = min_bucket; i <= max_bucket; i++)
+        if (!buckets[i].empty())
+        {
+            min_bucket = i;
+            return;
+        }
+}
+
+template <typename T>
+void Set<T>::update_max_bucket()
+{
+    for (unsigned int i = max_bucket; i >= min_bucket; i--)
+        if (!buckets[i].empty())
+        {
+            max_bucket = i;
+            return;
+        }
+}
+
