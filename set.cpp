@@ -72,7 +72,7 @@ Set<T>::Set()
 }
 
 template <typename T>
-Set<T>::Set(std::string filename)
+Set<T>::Set(const std::string &filename)
 {
     size = 0;
     capacity = 199;
@@ -150,7 +150,7 @@ void Set<T>::clear()
 }
 
 template <typename T>
-void Set<T>::save(std::string filename)
+void Set<T>::save(const std::string &filename) const
 {
     std::ofstream fout(filename);
     for (auto i = begin(); i != end(); ++i)
@@ -159,7 +159,7 @@ void Set<T>::save(std::string filename)
 }
 
 template <typename T>
-void Set<T>::print()
+void Set<T>::print() const
 {
     for (auto i = begin(); i != end(); ++i)
         std::cout << *i << std::endl;

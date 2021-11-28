@@ -10,10 +10,10 @@ class Set
 public:
     Set();
     Set(const Set<T> &other);
-    Set(std::string filename);
+    Set(const std::string &filename);
     ~Set();
-    void save(std::string filename);
-    void print();
+    void save(const std::string &filename) const;
+    void print() const;
     bool remove(T obj);
     void clear();
     bool operator<<(const T obj);
