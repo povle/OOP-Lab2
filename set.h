@@ -1,6 +1,7 @@
 #ifndef SET_H
 #define SET_H
 #include <list>
+#include <string>
 
 
 template <typename T>
@@ -9,7 +10,10 @@ class Set
 public:
     Set();
     Set(const Set<T> &other);
+    Set(std::string filename);
     ~Set();
+    void save(std::string filename);
+    void print();
     bool remove(T obj);
     void clear();
     bool operator<<(const T obj);

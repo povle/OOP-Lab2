@@ -20,6 +20,10 @@ void TestSet()
     assert(s[1]);
     assert(!s[3]);
 
+    s.save("test.txt");
+    Set<int> f("test.txt");
+    assert(f == s);
+
     Set<int> copy = Set<int>(s);
     assert(copy == s);
 
@@ -40,6 +44,7 @@ void TestSet()
     s.clear();
     assert(s.get_size() == 0);
     assert(s == empty);
+
 
 
     std::cerr << "TestSet(): No errors" << std::endl;

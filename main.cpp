@@ -13,7 +13,6 @@
 
 #include "set.h"
 #include "set.cpp"
-#include "string.h"
 #include <iostream>
 #include <test.h>
 

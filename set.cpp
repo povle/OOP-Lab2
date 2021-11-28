@@ -1,6 +1,9 @@
 #include "set.h"
 #include <list>
 #include <functional>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 template <typename T>
 T Set<T>::Iterator::operator*() const
@@ -69,6 +72,27 @@ Set<T>::Set()
 }
 
 template <typename T>
+Set<T>::Set(std::string filename)
+{
+    size = 0;
+    capacity = 199;
+    buckets = new std::list<T>[capacity];
+    for (unsigned int i = 0; i < capacity; i++)
+        buckets[i] = std::list<T>();
+
+    std::string line;
+    std::ifstream fin(filename);
+    T obj;
+    if (fin.is_open())
+    {
+      while(fin >> obj)
+        (*this) << obj;
+      fin.close();
+    }
+
+}
+
+template <typename T>
 Set<T>::Set(const Set<T> &other)
 {
     size = other.size;
@@ -123,6 +147,22 @@ void Set<T>::clear()
     delete [] buckets;
     buckets = new_buckets;
     size = 0;
+}
+
+template <typename T>
+void Set<T>::save(std::string filename)
+{
+    std::ofstream fout(filename);
+    for (auto i = begin(); i != end(); ++i)
+        fout << *i << std::endl;
+    fout.close();
+}
+
+template <typename T>
+void Set<T>::print()
+{
+    for (auto i = begin(); i != end(); ++i)
+        std::cout << *i << std::endl;
 }
 
 template <typename T>
