@@ -20,12 +20,17 @@ void TestSet()
     assert(s[1]);
     assert(!s[3]);
 
+    Set<int> copy = Set<int>(s);
+    assert(copy == s);
+
     assert(s.remove(1));
+    assert(copy != s);
     assert(s.get_size() == 1);
     assert(!s[1]);
 
     assert(!s.remove(3));
     assert(s.get_size() == 1);
+
 
     assert((s && empty) == empty);
 

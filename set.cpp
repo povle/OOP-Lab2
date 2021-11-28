@@ -69,6 +69,18 @@ Set<T>::Set()
 }
 
 template <typename T>
+Set<T>::Set(const Set<T> &other)
+{
+    size = other.size;
+    capacity = other.capacity;
+    buckets = new std::list<T>[capacity];
+    min_bucket = other.min_bucket;
+    max_bucket = other.max_bucket;
+    for (unsigned int i = 0; i < capacity; i++)
+        buckets[i] = std::list<T>(other.buckets[i]);
+}
+
+template <typename T>
 Set<T>::~Set()
 {
     delete [] buckets;

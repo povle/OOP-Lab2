@@ -8,6 +8,7 @@ class Set
 {
 public:
     Set();
+    Set(const Set<T> &other);
     ~Set();
     bool remove(T obj);
     void clear();
